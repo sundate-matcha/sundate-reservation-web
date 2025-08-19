@@ -1,0 +1,33 @@
+import Header from "../components/header";
+import Footer from "../components/footer";
+import ReservationForm from "./ReservationForm";
+
+export default function ReservationPage() {
+  return (
+    <div className="flex flex-col min-h-screen h-full w-full">
+      <div>
+        <Header />
+      </div>
+      <div className="relative flex items-center justify-center w-full h-fit">
+        <div className="z-1 relative w-full aspect-[9/16] lg:aspect-[16/9]">
+          <img
+            src="/public/images/chawan_photo2.jpg"
+            alt=""
+            className="w-full h-full object-cover hidden lg:block"
+          />
+          <img
+            src="/public/images/chawan_photo3.jpg"
+            alt=""
+            className="w-full h-full object-cover block lg:hidden"
+          />
+        </div>
+        <div className="absolute lg:top-1/2 left-1/2 lg:left-1/4 lg:-translate-y-1/2 -translate-x-1/2 z-10 w-[90%] lg:w-[30%]">
+          <ReservationForm />
+        </div>
+      </div>
+      <div>
+        <Footer />
+      </div>
+    </div>
+  );
+}
