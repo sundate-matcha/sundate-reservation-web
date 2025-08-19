@@ -1,4 +1,4 @@
-import { FaFacebook, FaInstagram, FaTiktok } from "react-icons/fa6";
+import { FaFacebook, FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
 
 export default function Footer() {
   return (
@@ -16,15 +16,42 @@ export default function Footer() {
         <div>📍41 khu pho My Tu 3, Tan Phong Ward, District 7, HCM City</div>
       </div>
       <div className="flex justify-center gap-10 mb-10">
-        
-        <div onClick={() => window.open("https://www.facebook.com/profile.php?id=61576618956568", "_blank")}>
-          <FaFacebook size={30}/>
+        <div
+          onClick={() =>
+            window.open(
+              "https://www.facebook.com/profile.php?id=61576618956568",
+              "_blank"
+            )
+          }
+        >
+          <FaFacebook size={30} />
         </div>
-        <div onClick={() => window.open("https://www.instagram.com/sundate.matchashelter?igsh=bWN4aWh1bTd0dHBk&utm_source=qr", "_blank")}>
-          <FaInstagram size={30}/>
+        <div
+          onClick={() =>
+            window.open(
+              "https://www.instagram.com/sundate.matchashelter",
+              "_blank"
+            )
+          }
+        >
+          <FaInstagram size={30} />
         </div>
-        <div onClick={() => window.open("https://www.tiktok.com/@sundatematcha?_t=ZS-8yzM7PG8UXh&_r=1", "_blank")}>
-          <FaTiktok size={30}/>
+        <div
+          onClick={() =>
+            window.open(
+              "https://www.threads.com/@sundate.matchashelter",
+              "_blank"
+            )
+          }
+        >
+          <FaThreads size={30} />
+        </div>
+        <div
+          onClick={() =>
+            window.open("https://www.tiktok.com/@sundatematcha", "_blank")
+          }
+        >
+          <FaTiktok size={30} />
         </div>
       </div>
       <div className="text-center mb-10">MONDAY - SUNDAY: 08:30 - 22:30</div>

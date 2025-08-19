@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { DatePicker, TimePicker } from "antd";
 import dayjs from "dayjs";
+import ReservationResultModal from "./ReservationResultModal";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
@@ -37,6 +38,9 @@ export default function ReservationForm() {
     description: "",
   });
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const mutation = useMutation({
     mutationFn: async (newReservation: ReservationData) => {
       const res = await fetch(
@@ -47,10 +51,12 @@ export default function ReservationForm() {
           body: JSON.stringify(newReservation),
         }
       );
+      if (!res.ok) throw new Error("Request failed");
       return res.json();
     },
     onSuccess: () => {
-      alert("Đặt bàn thành công!");
+      setIsSuccess(true);
+      setModalOpen(true);
       setForm({
         fullName: "",
         phone: "",
@@ -62,7 +68,8 @@ export default function ReservationForm() {
       });
     },
     onError: () => {
-      alert("Có lỗi xảy ra, vui lòng thử lại.");
+      setIsSuccess(false);
+      setModalOpen(true);
     },
   });
 
@@ -73,13 +80,11 @@ export default function ReservationForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Disable ngày trong quá khứ
   const disabledDate = (current: dayjs.Dayjs) => {
     if (!current) return false;
     return current < dayjs().startOf("day");
   };
 
-  // Disable giờ & phút đã qua
   const disabledTime = (date?: dayjs.Dayjs | null) => {
     const now = dayjs();
     return {
@@ -138,119 +143,126 @@ export default function ReservationForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-4 grid gap-4 w-full mx-auto bg-[#ffffff57] rounded-lg"
-    >
-      <h1 className="text-3xl font-bold text-center mb-6 text-[#fff8de]">
-        Reservation
-      </h1>
-      <div>
-        <Label htmlFor="name" className="text-[#fff8de] mb-2">
-          Full Name
-        </Label>
-        <Input
-          id="name"
-          type="text"
-          placeholder="Full Name"
-          value={form.fullName}
-          onChange={(e) => handleChange("fullName", e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="phone" className="text-[#fff8de] mb-2">
-          Phone Number
-        </Label>
-        <Input
-          id="phone"
-          type="tel"
-          placeholder="Phone Number"
-          value={form.phone}
-          onChange={(e) => handleChange("phone", e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="guestCount" className="text-[#fff8de] mb-2">
-          Number of Guests
-        </Label>
-        <Input
-          id="guestCount"
-          type="number"
-          value={form.guest}
-          onChange={(e) => handleChange("guest", Number(e.target.value))}
-          required
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 grid gap-4 w-full mx-auto bg-[#ffffff57] rounded-lg"
+      >
+        <h1 className="text-3xl font-bold text-center mb-6 text-[#fff8de]">
+          Reservation
+        </h1>
         <div>
-          <Label htmlFor="date" className="text-[#fff8de] mb-2">
-            Date
+          <Label htmlFor="name" className="text-[#fff8de] mb-2">
+            Full Name
           </Label>
-          <DatePicker
-            id="date"
-            className="w-full"
-            format="YYYY-MM-DD"
-            disabledDate={disabledDate}
-            value={form.date ? dayjs(form.date) : null}
-            onChange={(_, dateString) => handleChange("date", dateString)}
+          <Input
+            id="name"
+            type="text"
+            placeholder="Full Name"
+            value={form.fullName}
+            onChange={(e) => handleChange("fullName", e.target.value)}
+            required
           />
         </div>
         <div>
-          <Label htmlFor="time" className="text-[#fff8de] mb-2">
-            Time
+          <Label htmlFor="phone" className="text-[#fff8de] mb-2">
+            Phone Number
           </Label>
-          <TimePicker
-            id="time"
-            className="w-full"
-            format="HH:mm"
-            minuteStep={15}
-            hideDisabledOptions
-            disabledTime={() =>
-              disabledTime(form.date ? dayjs(form.date) : null)
-            }
-            value={form.time ? dayjs(form.time, "HH:mm") : null}
-            onChange={(_, timeString) => handleChange("time", timeString)}
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="Phone Number"
+            value={form.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            required
           />
         </div>
-      </div>
-      <div>
-        <Label className="text-[#fff8de]">Table Type</Label>
-        <div className="mt-2">
-          <Select
-            value={form.tableType}
-            onValueChange={(val) => handleChange("tableType", val)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Chọn loại bàn" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Bàn cửa sổ">Bàn cửa sổ</SelectItem>
-              <SelectItem value="Bàn quầy bar">Bàn quầy bar</SelectItem>
-              <SelectItem value="Bàn ngoài trời">Bàn ngoài trời</SelectItem>
-              <SelectItem value="Bàn dài (5-6 người)">
-                Bàn dài (5-6 người)
-              </SelectItem>
-            </SelectContent>
-          </Select>
+        <div>
+          <Label htmlFor="guestCount" className="text-[#fff8de] mb-2">
+            Number of Guests
+          </Label>
+          <Input
+            id="guestCount"
+            type="number"
+            value={form.guest}
+            onChange={(e) => handleChange("guest", Number(e.target.value))}
+            required
+          />
         </div>
-      </div>
-      <div>
-        <Label htmlFor="description" className="text-[#fff8de] mb-2">
-          Description
-        </Label>
-        <Textarea
-          id="description"
-          value={form.description}
-          onChange={(e) => handleChange("description", e.target.value)}
-        />
-      </div>
-      <div className="mt-6 flex justify-center">
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Đang đặt..." : "Đặt bàn"}
-        </Button>
-      </div>
-    </form>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="date" className="text-[#fff8de] mb-2">
+              Date
+            </Label>
+            <DatePicker
+              id="date"
+              className="w-full"
+              format="YYYY-MM-DD"
+              disabledDate={disabledDate}
+              value={form.date ? dayjs(form.date) : null}
+              onChange={(_, dateString) => handleChange("date", dateString)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="time" className="text-[#fff8de] mb-2">
+              Time
+            </Label>
+            <TimePicker
+              id="time"
+              className="w-full"
+              format="HH:mm"
+              minuteStep={15}
+              hideDisabledOptions
+              disabledTime={() =>
+                disabledTime(form.date ? dayjs(form.date) : null)
+              }
+              value={form.time ? dayjs(form.time, "HH:mm") : null}
+              onChange={(_, timeString) => handleChange("time", timeString)}
+            />
+          </div>
+        </div>
+        <div>
+          <Label className="text-[#fff8de]">Table Type</Label>
+          <div className="mt-2">
+            <Select
+              value={form.tableType}
+              onValueChange={(val) => handleChange("tableType", val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn loại bàn" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Bàn cửa sổ">Bàn cửa sổ</SelectItem>
+                <SelectItem value="Bàn quầy bar">Bàn quầy bar</SelectItem>
+                <SelectItem value="Bàn ngoài trời">Bàn ngoài trời</SelectItem>
+                <SelectItem value="Bàn dài (5-6 người)">
+                  Bàn dài (5-6 người)
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="description" className="text-[#fff8de] mb-2">
+            Description (optional)
+          </Label>
+          <Textarea
+            id="description"
+            value={form.description}
+            onChange={(e) => handleChange("description", e.target.value)}
+          />
+        </div>
+        <div className="mt-6 flex justify-center h-[60%] ">
+          <Button type="submit" variant={'default'} disabled={mutation.isPending} className="w-[40%] h-full !text-xl">
+            {mutation.isPending ? "Đang đặt..." : "BOOK NOW"}
+          </Button>
+        </div>
+      </form>
+      <ReservationResultModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        success={isSuccess}
+      />
+    </>
   );
 }
