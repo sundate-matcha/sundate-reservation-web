@@ -4,9 +4,9 @@ export default function Footer() {
   return (
     <footer className="bg-[#FFF8DE] py-4">
       <div className="container mx-auto flex items-center justify-center h-full gap-4 my-10">
-        <img src="/public/images/Symbol.png" alt="logo" className="w-32" />
+        <img src="/images/Symbol.png" alt="logo" className="w-32" />
         <img
-          src="/public/images/Typeeface (version 2).png"
+          src="/images/Typeeface (version 2).png"
           alt="logo"
           className="w-32"
         />
