@@ -17,6 +17,7 @@ export default function Footer() {
       </div>
       <div className="flex justify-center gap-10 mb-10">
         <div
+          className="cursor-pointer"
           onClick={() =>
             window.open(
               "https://www.facebook.com/profile.php?id=61576618956568",
@@ -27,6 +28,7 @@ export default function Footer() {
           <FaFacebook size={30} />
         </div>
         <div
+          className="cursor-pointer"
           onClick={() =>
             window.open(
               "https://www.instagram.com/sundate.matchashelter",
@@ -37,6 +39,7 @@ export default function Footer() {
           <FaInstagram size={30} />
         </div>
         <div
+          className="cursor-pointer"
           onClick={() =>
             window.open(
               "https://www.threads.com/@sundate.matchashelter",
@@ -47,6 +50,7 @@ export default function Footer() {
           <FaThreads size={30} />
         </div>
         <div
+          className="cursor-pointer"
           onClick={() =>
             window.open("https://www.tiktok.com/@sundatematcha", "_blank")
           }
