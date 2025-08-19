@@ -21,7 +21,7 @@ export default function ReservationResultModal({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>
             {success ? "Reservation Confirmed" : "Reservation Failed"}

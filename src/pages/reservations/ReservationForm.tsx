@@ -77,7 +77,6 @@ export default function ReservationForm() {
   //   },
   // });
 
-
   const mutation = useMutation({
     mutationFn: async (newReservation: ReservationData) => {
       await fetch(
@@ -276,6 +275,7 @@ export default function ReservationForm() {
             <Select
               value={form.tableType}
               onValueChange={(val) => handleChange("tableType", val)}
+              
             >
               <SelectTrigger>
                 <SelectValue placeholder="Chọn loại bàn" />
