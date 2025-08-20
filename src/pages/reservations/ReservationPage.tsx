@@ -4,11 +4,11 @@ import ReservationForm from "./ReservationForm";
 
 export default function ReservationPage() {
   return (
-    <div className="flex flex-col min-h-screen h-full w-full">
-      <div>
+    <div className="flex relative flex-col min-h-screen h-full w-full">
+      <div className="z-10">
         <Header />
       </div>
-      <div className="relative flex items-center justify-center w-full h-fit">
+      <div className="relative flex items-center justify-center w-full h-fit z-10">
         <div className="z-1 relative w-full aspect-[9/16] lg:aspect-[16/9]">
           <img
             src="/images/chawan_photo2.jpg"
@@ -25,7 +25,7 @@ export default function ReservationPage() {
           <ReservationForm />
         </div>
       </div>
-      <div>
+      <div className="z-10">
         <Footer />
       </div>
     </div>
