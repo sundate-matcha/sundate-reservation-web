@@ -1,0 +1,32 @@
+  // Đưa dữ liệu lên API
+  // const mutation = useMutation({
+  //   mutationFn: async (newReservation: ReservationData) => {
+  //     const res = await fetch(
+  //       "https://68a2a89fc5a31eb7bb1d6794.mockapi.io/api/reservation",
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(newReservation),
+  //       }
+  //     );
+  //     if (!res.ok) throw new Error("Request failed");
+  //     return res.json();
+  //   },
+  //   onSuccess: () => {
+  //     setIsSuccess(true);
+  //     setModalOpen(true);
+  //     setForm({
+  //       fullName: "",
+  //       phone: "",
+  //       guest: 1,
+  //       date: "",
+  //       time: "",
+  //       tableType: "",
+  //       description: "",
+  //     });
+  //   },
+  //   onError: () => {
+  //     setIsSuccess(false);
+  //     setModalOpen(true);
+  //   },
+  // });

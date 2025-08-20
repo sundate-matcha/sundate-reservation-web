@@ -136,7 +136,9 @@ export default function ReservationForm() {
 
   const disabledDate = (current: dayjs.Dayjs) => {
     if (!current) return false;
-    return current < dayjs().startOf("day");
+    const isPast = current < dayjs().startOf("day");
+    const isWeekend = current.day() === 0 || current.day() === 6; // 0: Sunday, 6: Saturday
+    return isPast || isWeekend;
   };
 
   const disabledTime = (date?: dayjs.Dayjs | null) => {
@@ -216,21 +218,54 @@ export default function ReservationForm() {
             <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
           )}
         </div>
-        <div>
-          <Label htmlFor="guestCount" className="text-[#fff8de] mb-2">
-            Number of Guests
-          </Label>
-          <Input
-            id="guestCount"
-            type="number"
-            value={form.guest}
-            onChange={(e) => handleChange("guest", Number(e.target.value))}
-            min={1}
-          />
-          {errors.guest && (
-            <p className="text-red-500 text-sm mt-1">{errors.guest}</p>
-          )}
+        <div className="w-full  justify-between grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="guestCount" className="text-[#fff8de] mb-2">
+              Number of Guests
+            </Label>
+            <Select
+              value={form.guest.toString()}
+              onValueChange={(val) => handleChange("guest", Number(val))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select number of guests" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(8)].map((_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.guest && (
+              <p className="text-red-500 text-sm mt-1">{errors.guest}</p>
+            )}
+          </div>
+          <div>
+            <Label className="text-[#fff8de]">Table Type</Label>
+            <div className="mt-2">
+              <Select
+                value={form.tableType}
+                onValueChange={(val) => handleChange("tableType", val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn loại bàn" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Bàn cửa sổ">Bàn cửa sổ</SelectItem>
+                  <SelectItem value="Bàn quầy bar">Bàn quầy bar</SelectItem>
+                  <SelectItem value="Bàn ngoài trời">Bàn ngoài trời</SelectItem>
+                  <SelectItem value="Bàn dài">Bàn dài</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {errors.tableType && (
+              <p className="text-red-500 text-sm mt-1">{errors.tableType}</p>
+            )}
+          </div>
         </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="date" className="text-[#fff8de] mb-2">
@@ -270,33 +305,8 @@ export default function ReservationForm() {
           </div>
         </div>
         <div>
-          <Label className="text-[#fff8de]">Table Type</Label>
-          <div className="mt-2">
-            <Select
-              value={form.tableType}
-              onValueChange={(val) => handleChange("tableType", val)}
-              
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn loại bàn" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Bàn cửa sổ">Bàn cửa sổ</SelectItem>
-                <SelectItem value="Bàn quầy bar">Bàn quầy bar</SelectItem>
-                <SelectItem value="Bàn ngoài trời">Bàn ngoài trời</SelectItem>
-                <SelectItem value="Bàn dài (5-6 người)">
-                  Bàn dài (5-6 người)
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {errors.tableType && (
-            <p className="text-red-500 text-sm mt-1">{errors.tableType}</p>
-          )}
-        </div>
-        <div>
           <Label htmlFor="description" className="text-[#fff8de] mb-2">
-            Description (optional)
+            Note (optional)
           </Label>
           <Textarea
             id="description"
@@ -311,13 +321,16 @@ export default function ReservationForm() {
             disabled={mutation.isPending}
             className="w-[40%] h-full !text-xl"
           >
-            {mutation.isPending ? "Đang đặt..." : "BOOK NOW"}
+            {mutation.isPending ? "PROCESSING..." : "BOOK NOW"}
           </Button>
         </div>
       </form>
       <ReservationResultModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
         success={isSuccess}
       />
     </>
