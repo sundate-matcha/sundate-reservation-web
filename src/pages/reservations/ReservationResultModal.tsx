@@ -62,12 +62,12 @@ export default function ReservationResultModal({
               />
             )}
             {success
-              ? "Your table has been reserved successfully. We look forward to welcoming you."
-              : "We couldn’t process your reservation. Please try again."}
+              ? "Bạn đã đặt bàn thành công. Sundate sẽ giữ bàn của bạn trong vòng 15 phút, bạn vui lòng đến đúng giờ nhé!"
+              : "Chúng tôi không thể xử lý đặt chỗ của bạn. Vui lòng thử lại."}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button onClick={onClose}>Close ({countdown})</Button>
+          <Button onClick={onClose}>Đóng ({countdown})</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
