@@ -80,7 +80,7 @@ export default function ReservationForm() {
   const mutation = useMutation({
     mutationFn: async (newReservation: ReservationData) => {
       await fetch(
-        "https://script.google.com/macros/s/AKfycbzAKfkVBKZ7O6HF7vD6j3M_7BP52wUi9YsYCN2VXUU6vPOELzII5eJw-jzHHGyI3ASl/exec",
+        "https://script.google.com/macros/s/AKfycbwn3mL8titSduEzflpUehskRzzAJyREltPxK9C0Lqc3_siF0WWCYZJYjs6WxUo8SG8S/exec",
         {
           method: "POST",
           mode: "no-cors",
