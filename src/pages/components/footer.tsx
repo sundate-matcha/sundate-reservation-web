@@ -11,7 +11,7 @@ export default function Footer() {
           className="w-32"
         />
       </div>
-      <div className="flex lg:flex-row lg:justify-center lg:gap-10 flex-col lg:items-center">
+      <div className="flex lg:flex-row lg:justify-center lg:gap-50 flex-col lg:items-center">
         <div>
           <div className="text-center mb-10">
             <div>A hidden cozy matcha shelter in District 7</div>
