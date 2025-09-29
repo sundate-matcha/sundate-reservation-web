@@ -44,51 +44,29 @@ export default function ReservationForm() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Đưa dữ liệu lên API
-  // const mutation = useMutation({
-  //   mutationFn: async (newReservation: ReservationData) => {
-  //     const res = await fetch(
-  //       "https://68a2a89fc5a31eb7bb1d6794.mockapi.io/api/reservation",
-  //       {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(newReservation),
-  //       }
-  //     );
-  //     if (!res.ok) throw new Error("Request failed");
-  //     return res.json();
-  //   },
-  //   onSuccess: () => {
-  //     setIsSuccess(true);
-  //     setModalOpen(true);
-  //     setForm({
-  //       fullName: "",
-  //       phone: "",
-  //       guest: 1,
-  //       date: "",
-  //       time: "",
-  //       tableType: "",
-  //       description: "",
-  //     });
-  //   },
-  //   onError: () => {
-  //     setIsSuccess(false);
-  //     setModalOpen(true);
-  //   },
-  // });
-
   const mutation = useMutation({
     mutationFn: async (newReservation: ReservationData) => {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbwn3mL8titSduEzflpUehskRzzAJyREltPxK9C0Lqc3_siF0WWCYZJYjs6WxUo8SG8S/exec",
+      const payload = {
+        name: newReservation.fullName,
+        phone: newReservation.phone,
+        date: `${newReservation.date}T${newReservation.time}:00`,
+        time: newReservation.time,
+        guests: newReservation.guest,
+        specialRequests: newReservation.tableType,
+        notes: newReservation.description,
+      };
+
+      const res = await fetch(
+        "https://sundate.justdemo.work/api/reservations",
         {
           method: "POST",
-          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newReservation),
+          body: JSON.stringify(payload),
         }
       );
-      return { result: "success" };
+      console.log("Submitted data:", payload);
+      if (!res.ok) throw new Error("Request failed");
+      return res.json();
     },
     onSuccess: () => {
       setIsSuccess(true);
@@ -104,8 +82,7 @@ export default function ReservationForm() {
       });
       setErrors({});
     },
-    onError: (err) => {
-      console.error("Mutation error:", err);
+    onError: () => {
       setIsSuccess(false);
       setModalOpen(true);
     },
@@ -116,7 +93,7 @@ export default function ReservationForm() {
     value: string | number | string[]
   ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: "" })); // Xóa lỗi khi user sửa
+    setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
   const validate = (): boolean => {
@@ -137,7 +114,7 @@ export default function ReservationForm() {
   const disabledDate = (current: dayjs.Dayjs) => {
     if (!current) return false;
     const isPast = current < dayjs().startOf("day");
-    const isWeekend = current.day() === 0 || current.day() === 6; // 0: Sunday, 6: Saturday
+    const isWeekend = current.day() === 0 || current.day() === 6;
     return isPast || isWeekend;
   };
 

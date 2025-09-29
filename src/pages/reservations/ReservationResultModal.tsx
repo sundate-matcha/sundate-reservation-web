@@ -7,7 +7,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -25,12 +24,13 @@ export default function ReservationResultModal({
 
   useEffect(() => {
     if (open) {
-      setCountdown(10); // reset khi mở modal
+      setCountdown(10);
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
-            onClose(); // tự đóng khi hết thời gian
+            // Delay onClose ra ngoài vòng render
+            setTimeout(() => onClose(), 0);
             return 0;
           }
           return prev - 1;
@@ -47,23 +47,14 @@ export default function ReservationResultModal({
           <DialogTitle>
             {success ? "Reservation Confirmed" : "Reservation Failed"}
           </DialogTitle>
-          <DialogDescription>
-            {success ? (
-              <DotLottieReact
-                src="https://lottie.host/13a53afb-e00a-44c0-b417-c5d15281027c/4eV1Xi3FCx.lottie"
-                autoplay
-                className="w-64 h-64 my-10 mx-auto"
-              />
-            ) : (
-              <DotLottieReact
-                src="https://lottie.host/e04332b3-2853-471c-8cc7-87d0ec51fdfa/CBiVtY9WXh.lottie"
-                autoplay
-                className="w-64 h-64 my-10 mx-auto"
-              />
-            )}
-            {success
-              ? "Bạn đã đặt bàn thành công. Sundate sẽ giữ bàn của bạn trong vòng 15 phút, bạn vui lòng đến đúng giờ nhé!"
-              : "Chúng tôi không thể xử lý đặt chỗ của bạn. Vui lòng thử lại."}
+          <DialogDescription asChild>
+            <div>
+              <p className="text-center mt-4">
+                {success
+                  ? "Bạn đã đặt bàn thành công. Sundate sẽ giữ bàn của bạn trong vòng 15 phút, bạn vui lòng đến đúng giờ nhé!"
+                  : "Chúng tôi không thể xử lý đặt chỗ của bạn. Vui lòng thử lại."}
+              </p>
+            </div>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
