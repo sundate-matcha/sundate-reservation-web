@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,8 +23,14 @@ type ReservationData = {
   guest: number;
   date: string;
   time: string;
-  tableType: string;
-  description?: string;
+  tableCategory: string;
+  notes?: string;
+};
+
+type TableCategory = {
+  _id: string;
+  name: string;
+  capacity: number;
 };
 
 export default function ReservationForm() {
@@ -34,26 +40,51 @@ export default function ReservationForm() {
     guest: 1,
     date: "",
     time: "",
-    tableType: "",
-    description: "",
+    tableCategory: "",
+    notes: "",
   });
 
+  const [tableCategories, setTableCategories] = useState<TableCategory[]>([]);
   const [errors, setErrors] = useState<
     Partial<Record<keyof ReservationData, string>>
   >({});
   const [modalOpen, setModalOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Fetch danh sách TableCategory từ API
+  useEffect(() => {
+    fetch("https://sundate.justdemo.work/api/table-categories")
+      .then((res) => res.json())
+      .then((data) => {
+        // Kiểm tra nếu server trả về object chứa mảng
+        if (Array.isArray(data)) {
+          setTableCategories(data);
+        } else if (Array.isArray(data.tableCategories)) {
+          setTableCategories(data.tableCategories);
+        } else {
+          console.error("Unexpected API response:", data);
+          setTableCategories([]);
+        }
+      })
+      .catch((err) => console.error("Error fetching table categories:", err));
+  }, []);
+
   const mutation = useMutation({
     mutationFn: async (newReservation: ReservationData) => {
+      let phone = newReservation.phone.trim();
+      if (phone.startsWith("0")) {
+        phone = "+84" + phone.slice(1);
+      } else if (!phone.startsWith("+84")) {
+        phone = "+84" + phone; // fallback nếu người dùng nhập thiếu
+      }
       const payload = {
         name: newReservation.fullName,
-        phone: newReservation.phone,
-        date: `${newReservation.date}T${newReservation.time}:00`,
+        phone,
+        date: dayjs(newReservation.date).format("YYYY-MM-DD"),
         time: newReservation.time,
         guests: newReservation.guest,
-        specialRequests: newReservation.tableType,
-        notes: newReservation.description,
+        tableCategory: newReservation.tableCategory,
+        notes: newReservation.notes,
       };
 
       const res = await fetch(
@@ -64,8 +95,15 @@ export default function ReservationForm() {
           body: JSON.stringify(payload),
         }
       );
+
       console.log("Submitted data:", payload);
-      if (!res.ok) throw new Error("Request failed");
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Server error:", errorData);
+        throw new Error(errorData.message || "Request failed");
+      }
+
       return res.json();
     },
     onSuccess: () => {
@@ -77,8 +115,8 @@ export default function ReservationForm() {
         guest: 1,
         date: "",
         time: "",
-        tableType: "",
-        description: "",
+        tableCategory: "",
+        notes: "",
       });
       setErrors({});
     },
@@ -104,7 +142,8 @@ export default function ReservationForm() {
     if (form.guest < 1) newErrors.guest = "Number of guests must be at least 1";
     if (!form.date) newErrors.date = "Date is required";
     if (!form.time) newErrors.time = "Time is required";
-    if (!form.tableType) newErrors.tableType = "Table Type is required";
+    if (!form.tableCategory)
+      newErrors.tableCategory = "Please select a table category";
 
     setErrors(newErrors);
 
@@ -114,8 +153,7 @@ export default function ReservationForm() {
   const disabledDate = (current: dayjs.Dayjs) => {
     if (!current) return false;
     const isPast = current < dayjs().startOf("day");
-    const isWeekend = current.day() === 0 || current.day() === 6;
-    return isPast || isWeekend;
+    return isPast;
   };
 
   const disabledTime = (date?: dayjs.Dayjs | null) => {
@@ -143,8 +181,6 @@ export default function ReservationForm() {
             if (!minutes.includes(i)) minutes.push(i);
           }
         }
-        if (hour === 8) minutes.push(0, 15);
-        if (hour === 21) minutes.push(15, 30, 45);
         return minutes;
       },
     };
@@ -156,6 +192,12 @@ export default function ReservationForm() {
     mutation.mutate(form);
   };
 
+  const maxGuests =
+    tableCategories.find((cat) => cat._id === form.tableCategory)?.name ===
+    "Bàn quầy bar"
+      ? 2
+      : 8;
+
   return (
     <>
       <form
@@ -165,6 +207,8 @@ export default function ReservationForm() {
         <h1 className="text-3xl font-bold text-center mb-6 text-[#fff8de]">
           Reservation
         </h1>
+
+        {/* Name */}
         <div>
           <Label htmlFor="name" className="text-[#fff8de] mb-2">
             Full Name
@@ -180,6 +224,8 @@ export default function ReservationForm() {
             <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
           )}
         </div>
+
+        {/* Phone */}
         <div>
           <Label htmlFor="phone" className="text-[#fff8de] mb-2">
             Phone Number
@@ -195,7 +241,9 @@ export default function ReservationForm() {
             <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
           )}
         </div>
-        <div className="w-full  justify-between grid grid-cols-2 gap-4">
+
+        {/* Guests & Table */}
+        <div className="w-full grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="guestCount" className="text-[#fff8de] mb-2">
               Number of Guests
@@ -208,7 +256,7 @@ export default function ReservationForm() {
                 <SelectValue placeholder="Select number of guests" />
               </SelectTrigger>
               <SelectContent>
-                {[...Array(8)].map((_, i) => (
+                {[...Array(maxGuests)].map((_, i) => (
                   <SelectItem key={i + 1} value={(i + 1).toString()}>
                     {i + 1}
                   </SelectItem>
@@ -219,30 +267,42 @@ export default function ReservationForm() {
               <p className="text-red-500 text-sm mt-1">{errors.guest}</p>
             )}
           </div>
+
           <div>
-            <Label className="text-[#fff8de]">Table Type</Label>
+            <Label className="text-[#fff8de]">Table</Label>
             <div className="mt-2">
               <Select
-                value={form.tableType}
-                onValueChange={(val) => handleChange("tableType", val)}
+                value={form.tableCategory}
+                onValueChange={(val) => handleChange("tableCategory", val)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Chọn loại bàn" />
+                  <SelectValue placeholder="Select table type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Bàn cửa sổ">Bàn cửa sổ</SelectItem>
-                  <SelectItem value="Bàn quầy bar">Bàn quầy bar</SelectItem>
-                  <SelectItem value="Bàn ngoài trời">Bàn ngoài trời</SelectItem>
-                  <SelectItem value="Bàn dài">Bàn dài</SelectItem>
+                  {Array.isArray(tableCategories) &&
+                  tableCategories.length > 0 ? (
+                    tableCategories.map((cat) => (
+                      <SelectItem key={cat._id} value={cat._id}>
+                        {cat.name} ({cat.capacity})
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem disabled value="no-category">
+                      No categories available
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
-            {errors.tableType && (
-              <p className="text-red-500 text-sm mt-1">{errors.tableType}</p>
+            {errors.tableCategory && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.tableCategory}
+              </p>
             )}
           </div>
         </div>
 
+        {/* Date & Time */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="date" className="text-[#fff8de] mb-2">
@@ -281,16 +341,20 @@ export default function ReservationForm() {
             )}
           </div>
         </div>
+
+        {/* Notes */}
         <div>
-          <Label htmlFor="description" className="text-[#fff8de] mb-2">
+          <Label htmlFor="notes" className="text-[#fff8de] mb-2">
             Note (optional)
           </Label>
           <Textarea
-            id="description"
-            value={form.description}
-            onChange={(e) => handleChange("description", e.target.value)}
+            id="notes"
+            value={form.notes}
+            onChange={(e) => handleChange("notes", e.target.value)}
           />
         </div>
+
+        {/* Submit */}
         <div className="mt-6 flex justify-center h-[60%]">
           <Button
             type="submit"
@@ -302,6 +366,7 @@ export default function ReservationForm() {
           </Button>
         </div>
       </form>
+
       <ReservationResultModal
         open={modalOpen}
         onClose={() => {

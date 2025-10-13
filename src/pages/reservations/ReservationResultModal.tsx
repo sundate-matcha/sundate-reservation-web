@@ -47,6 +47,11 @@ export default function ReservationResultModal({
           <DialogTitle>
             {success ? "Reservation Confirmed" : "Reservation Failed"}
           </DialogTitle>
+          {success ? (
+            <img src="/public/images/check.png" alt="" className="w-[50%] mx-auto" />
+          ) : (
+            <img src="/public/images/remove.png" alt="" className="w-[50%] mx-auto" />
+          )}
           <DialogDescription asChild>
             <div>
               <p className="text-center mt-4">
