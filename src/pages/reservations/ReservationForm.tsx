@@ -77,6 +77,7 @@ export default function ReservationForm() {
       } else if (!phone.startsWith("+84")) {
         phone = "+84" + phone; // fallback nếu người dùng nhập thiếu
       }
+
       const payload = {
         name: newReservation.fullName,
         phone,
@@ -98,14 +99,17 @@ export default function ReservationForm() {
 
       console.log("Submitted data:", payload);
 
+      // ✅ NÊN parse lỗi đúng kiểu backend trả về
+      const data = await res.json();
       if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Server error:", errorData);
-        throw new Error(errorData.message || "Request failed");
+        // ném luôn object lỗi để onError nhận được toàn bộ JSON backend
+        throw data;
       }
 
-      return res.json();
+      return data;
     },
+
+    // ✅ Khi thành công
     onSuccess: () => {
       setIsSuccess(true);
       setModalOpen(true);
@@ -120,7 +124,10 @@ export default function ReservationForm() {
       });
       setErrors({});
     },
-    onError: () => {
+
+    // ✅ Khi lỗi
+    onError: (error: any) => {
+      console.error("Server returned error:", error);
       setIsSuccess(false);
       setModalOpen(true);
     },
@@ -173,6 +180,10 @@ export default function ReservationForm() {
       },
       disabledMinutes: (hour: number) => {
         const minutes: number[] = [];
+        if (hour === 21) {
+          for (let i = 1; i < 60; i++) minutes.push(i);
+          return minutes;
+        }
         for (let i = 0; i < 60; i++) {
           if (i % 15 !== 0) minutes.push(i);
         }
@@ -202,9 +213,9 @@ export default function ReservationForm() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="p-4 grid gap-4 w-full mx-auto bg-[#ffffff57] rounded-lg"
+        className="p-4 grid gap-4 w-full mx-auto bg-[#ffffff88] rounded-lg"
       >
-        <h1 className="text-3xl font-bold text-center mb-6 text-[#fff8de]">
+        <h1 className="text-3xl font-bold text-center mb-6 text-[#831B1B]">
           Reservation
         </h1>
 
@@ -253,7 +264,7 @@ export default function ReservationForm() {
               onValueChange={(val) => handleChange("guest", Number(val))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select number of guests" />
+                <SelectValue placeholder="Số lượng khách" />
               </SelectTrigger>
               <SelectContent>
                 {[...Array(maxGuests)].map((_, i) => (
@@ -276,14 +287,14 @@ export default function ReservationForm() {
                 onValueChange={(val) => handleChange("tableCategory", val)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select table type" />
+                  <SelectValue placeholder="Chọn bàn" />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.isArray(tableCategories) &&
                   tableCategories.length > 0 ? (
                     tableCategories.map((cat) => (
                       <SelectItem key={cat._id} value={cat._id}>
-                        {cat.name} ({cat.capacity})
+                        {cat.name}
                       </SelectItem>
                     ))
                   ) : (
@@ -374,6 +385,7 @@ export default function ReservationForm() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         success={isSuccess}
+        response={mutation.isSuccess ? mutation.data : mutation.error}
       />
     </>
   );

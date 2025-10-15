@@ -9,14 +9,14 @@ export default function ReservationPage() {
         <Header />
       </div>
       <div className="relative flex items-center justify-center w-full h-fit z-10">
-        <div className="z-1 relative w-full aspect-[9/16] lg:aspect-[16/9]">
+        <div className="z-1 relative w-full  lg:aspect-[16/9] aspect-[9/16]">
           <img
-            src="/images/chawan_photo2.jpg"
+            src="/images/20-10(horizontal).jpg"
             alt=""
-            className="w-full h-full object-cover hidden lg:block"
+            className="w-full object-cover hidden lg:block"
           />
           <img
-            src="/images/chawan_photo3.jpg"
+            src="/images/20-10(vertical).jpg"
             alt=""
             className="w-full h-full object-cover block lg:hidden"
           />
