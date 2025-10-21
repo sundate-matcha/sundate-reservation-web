@@ -215,7 +215,7 @@ export default function ReservationForm() {
         onSubmit={handleSubmit}
         className="p-4 grid gap-4 w-full mx-auto bg-[#ffffff88] rounded-lg"
       >
-        <h1 className="text-3xl font-bold text-center mb-6 text-[#831B1B]">
+        <h1 className="text-3xl font-bold text-center mb-6 text-[#fff8de]">
           Reservation
         </h1>
 
