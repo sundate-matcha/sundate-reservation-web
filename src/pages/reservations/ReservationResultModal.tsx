@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
 type Props = {
   open: boolean;
@@ -103,24 +104,20 @@ export default function ReservationResultModal({
           </DialogTitle>
 
           {success ? (
-            <img
-              src="/public/images/check.png"
-              alt=""
-              className="w-[50%] mx-auto"
+            <CheckCircleOutlined
+              className="mx-auto text-9xl"
+              style={{ color: "green" }}
             />
           ) : (
-            <img
-              src="/public/images/remove.png"
-              alt=""
-              className="w-[50%] mx-auto"
+            <CloseCircleOutlined
+              className="mx-auto text-9xl"
+              style={{ color: "red" }}
             />
           )}
 
           <DialogDescription asChild>
             <div>
-              <div className="mt-4 text-center">
-                {renderMessage()}
-              </div>
+              <div className="mt-4 text-center">{renderMessage()}</div>
             </div>
           </DialogDescription>
         </DialogHeader>
